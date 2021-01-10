@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <link rel="stylesheet" href="style.css" />
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+        <title>Irbes plāns</title>
+    </head>
+    <body>
+        <div class="modal fade" id="winner-modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="winner-modal-label">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="winner-modal-label">Mums ir uzvarētājs!</h5>
+                        <button type="button" class="btn-close return-to-start" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p id="winner" class="fs-5 text"></p>
+                        <img id="animal-img-win" src="lynx-win.jpg" alt="winner" class="w-100"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success return-to-start" data-bs-dismiss="modal">Atpakaļ uz pļavu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h1 class="text-center mb-3">Irbes plāns</h1>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1 fs-6">
+                    Lūsis un irbe atrodas 5 × 5 rūtiņu pļavā. Lūsis grib apēst irbi,
+                    bet irbe cenšas aizbēgt. Vienā gājienā viņi pārvietojas no viena punkta uz kādu
+                    blakus esošo punktu, kas ir savienots ar līniju. Gājieni tiek izdarīti pamīšus. Pirmo
+                    gājienu izdara lūsis. Ja desmit lūša gājienu laikā irbe netiek noķerta, tad tā aizbēg, bet, ja
+                    šo gājienu laikā lūsis viņu noķer, tad irbe tiek apēsta. Gan lūsis, gan irbe visu laiku pilnībā
+                    pārredz pļavu. Kurš no viņiem, pareizi izdarot gājienus, vienmēr var sasniegt savu mērķi –
+                    lūsis (oranžais) vai irbe (brūnā)?
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-8 col-lg-6 offset-lg-1 col-xxl-5">
+                    <div class="mx-auto">
+                        <canvas id="myCanvas" width="500" height="500"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-4 col-xxl-5">
+                    <div class="ps-md-5 ps-xl-0 my-3 mt-md-0">
+                        <div class="row">
+                            <div class="col-4 col-md-12">
+                                <button id="start-game" type="button" class="btn btn-warning shadow-none mb-3">Sākt spēli</button>
+                            </div>
+                            <div class="col-8 col-md-12">
+                                <div id="moves" class="visually-hidden">
+                                    <p id="lynx-moves">Lūsim atlikušie gājieni: <span id="lynx-moves-left">10</span></p>
+                                    <p id="animal">Lūša gājiens</p>
+                                </div>
+                                <img id="animal-img" src="lynx.jpg" alt="animal" class="animal-image visually-hidden"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

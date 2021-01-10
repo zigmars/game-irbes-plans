@@ -1,0 +1,20 @@
+canvas {
+    background: #eee;
+}
+
+html {
+    box-sizing: border-box;
+    text-align: justify;
+}
+
+.animal-image {
+    width: 240px;
+    border-style: solid;
+    border-width: 20px;
+}
+
+@media screen and (min-width: 768px) and (max-width: 992px) {
+    .animal-image {
+        width: 100%;
+    }
+}
