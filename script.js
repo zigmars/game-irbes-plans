@@ -182,7 +182,7 @@ function resetAnimalPositions() {
 
 function updateAnimalImage(animal) {
     animalImage.style.borderColor = animal['colour'];
-    animalImage.src = `${animal['name']}.jpg`;
+    animalImage.src = `assets/${animal['name']}.jpg`;
 }
 
 startButton.addEventListener('click', startGame);
@@ -245,7 +245,7 @@ canvas.addEventListener(
         // end game: lynx caught perdicinae
         if (lynx.position === perdicinae.position) {
             modalText.textContent = String('Lūsis noķēra irbi');
-            animalImageWin.src = `${lynx.name}-win.jpg`;
+            animalImageWin.src = `assets/${lynx.name}-win.jpg`;
             winnerModal.show();
             return;
         }
@@ -253,7 +253,7 @@ canvas.addEventListener(
         // end game: lynx ran out of moves
         if (lynxMovesLeft === 0) {
             modalText.textContent = String('Irbe aizbēga');
-            animalImageWin.src = `${perdicinae.name}-win.jpg`;
+            animalImageWin.src = `assets/${perdicinae.name}-win.jpg`;
             winnerModal.show();
             return;
         }
