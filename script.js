@@ -1,6 +1,6 @@
 'use strict';
 
-const myModal = new bootstrap.Modal(document.getElementById('winner-modal'));
+const winnerModal = new bootstrap.Modal(document.getElementById('winner-modal'));
 const canvasWidth = document.getElementById('myCanvas').offsetWidth;
 
 let canvas = document.getElementById("myCanvas");
@@ -14,13 +14,14 @@ const animalMoves = document.getElementById('moves');
 const lynxMovesLeftText = document.getElementById('lynx-moves-left');
 
 let lynxMovesLeft = 10;
-let showMoves = false;
+let gameActive = false;
 let activeAnimal = 0;
 let fieldColor = "limegreen";
-let mouse;
 
-const size = canvasWidth / 7;
-const ballRadius = size / 10;
+const gridCount = 6;
+const gridFieldWidth = gridCount-1;
+const gridCellSizePx = canvasWidth / (gridFieldWidth+2);
+const ballRadius = gridCellSizePx / 10;
 
 const positions = {};
 const relations = {};
@@ -41,21 +42,21 @@ const perdicinae = {
 };
 
 const animals = [lynx, perdicinae];
+const LynxIdx = 0;
 
 function init(){
-    let arrSize = 6;
-    for(const r of Array(arrSize).keys()){
-        for(const c of Array(arrSize).keys()){
+    for(const r of Array(gridCount).keys()){
+        for(const c of Array(gridCount).keys()){
             let key = grid2line(r,c);
             // setup positions
-            positions[key] = {x: (c+1)*size, y: (r+1)*size};
+            positions[key] = {x: (c+1)*gridCellSizePx, y: (r+1)*gridCellSizePx};
             // setup relations
             relations[key] = neigborArray(r,c);
         }
     }
 
     function grid2line(r, c){
-        return "p" + (arrSize * r + c + 1).toString();
+        return "p" + (gridCount * r + c + 1).toString();
     }
 
     function neigborArray(r,c) {
@@ -64,13 +65,13 @@ function init(){
         if (r-1 >= 0){
             nArr.push(grid2line(r-1,c));
         }
-        if (r+1 < arrSize){
+        if (r+1 < gridCount){
             nArr.push(grid2line(r+1,c));
         }
         if (c-1 >= 0){
             nArr.push(grid2line(r,c-1));
         }
-        if (c+1 < arrSize){
+        if (c+1 < gridCount){
             nArr.push(grid2line(r,c+1));
         }
 
@@ -115,7 +116,7 @@ function drawAnimals() {
         ctx.arc(
             positions[animal.position].x,
             positions[animal.position].y,
-            size / 5,
+            gridCellSizePx / 5,
             0,
             Math.PI * 2
             , false
@@ -138,18 +139,18 @@ function drawMoves(animal) {
 function drawOneMove(animal, position) {
     ctx.beginPath();
     ctx.strokeStyle = animal.colour;
-    ctx.arc(positions[position].x, positions[position].y, size / 5, 0, 2 * Math.PI);
+    ctx.arc(positions[position].x, positions[position].y, gridCellSizePx / 5, 0, 2 * Math.PI);
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
 }
 
 function startGame() {
-    getInitialState();
+    resetAnimalPositions();
     drawMoves(animals[activeAnimal]);
-    gatAnimalImage(animals[activeAnimal]);
+    updateAnimalImage(animals[activeAnimal]);
 
-    showMoves = true;
+    gameActive = true;
 
     startButton.textContent = 'Sākt vēlreiz';
     animalMoves.classList.remove('visually-hidden');
@@ -158,7 +159,7 @@ function startGame() {
     animalImage.classList.remove('visually-hidden');
 }
 
-function getInitialState() {
+function resetAnimalPositions() {
     activeAnimal = 0;
     lynxMovesLeft = 10;
     lynxMovesLeftText.textContent = String(lynxMovesLeft);
@@ -168,7 +169,7 @@ function getInitialState() {
     draw();
 }
 
-function gatAnimalImage(animal) {
+function updateAnimalImage(animal) {
     animalImage.style.borderColor = animal['colour'];
     animalImage.src = `${animal['name']}.jpg`;
 }
@@ -177,7 +178,7 @@ startButton.addEventListener('click', startGame);
 
 document.querySelectorAll('.return-to-start').forEach(item => {
     item.addEventListener('click', event => {
-        getInitialState();
+        resetAnimalPositions();
 
         startButton.textContent = 'Sākt spēli';
         animalMoves.classList.add('visually-hidden');
@@ -185,19 +186,18 @@ document.querySelectorAll('.return-to-start').forEach(item => {
         startButton.classList.remove('btn-danger');
         animalImage.classList.add('visually-hidden');
 
-        showMoves = false;
+        gameActive = false;
     })
 })
 
 canvas.addEventListener(
     "click",
     function(event) {
-        if (!showMoves) {
+        if (!gameActive) {
             return;
         }
 
-        mouse = oMousePos(canvas, event);
-
+        const mouse = getMousePos(canvas, event);
         const modalText = document.getElementById('winner');
 
         let possibleMoves = relations[animals[activeAnimal].position];
@@ -206,40 +206,42 @@ canvas.addEventListener(
             drawOneMove(animals[activeAnimal], move);
 
             if (ctx.isPointInPath(mouse.x, mouse.y)) {
-                const x = Math.round(mouse.x / size) * size;
-                const y = Math.round(mouse.y / size) * size;
+                const aniPosX = Math.round(mouse.x / gridCellSizePx) * gridCellSizePx;
+                const aniPosY = Math.round(mouse.y / gridCellSizePx) * gridCellSizePx;
 
                 animals[activeAnimal].position = Object.keys(positions)
-                    .find(key => positions[key].x === x && positions[key].y === y);
+                    .find(key => positions[key].x === aniPosX && positions[key].y === aniPosY);
 
                 if (activeAnimal === 0) {
                     lynxMovesLeft--;
                     lynxMovesLeftText.textContent = String(lynxMovesLeft);
                 }
 
+                // end game: lynx caught perdicinae
                 if (lynx.position === perdicinae.position) {
                     modalText.textContent = String('Lūsis noķēra irbi');
                     animalImageWin.src = `${lynx.name}-win.jpg`;
-                    myModal.show();
+                    winnerModal.show();
 
                     break;
                 }
 
+                // end game: lynx ran out of moves
                 if (lynxMovesLeft === 0) {
                     modalText.textContent = String('Irbe aizbēga');
                     animalImageWin.src = `${perdicinae.name}-win.jpg`;
-                    myModal.show();
+                    winnerModal.show();
 
                     break;
                 }
 
-                activeAnimal = activeAnimal === 0 ? 1 : 0;
+                activeAnimal = activeAnimal === LynxIdx ? 1 : LynxIdx;
 
-                let animalName = activeAnimal === 0 ? 'Lūša' : 'Irbes';
-
+                // update game HUD for animal turn details
+                let animalName = activeAnimal === LynxIdx ? 'Lūša' : 'Irbes';
                 document.getElementById('animal').textContent = `${animalName} gājiens`;
 
-                gatAnimalImage(animals[activeAnimal]);
+                updateAnimalImage(animals[activeAnimal]);
                 draw();
                 drawMoves(animals[activeAnimal]);
 
@@ -252,7 +254,7 @@ canvas.addEventListener(
     false
 );
 
-function oMousePos(canvas, evt) {
+function getMousePos(canvas, evt) {
     let ClientRect = canvas.getBoundingClientRect();
 
     return {
