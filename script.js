@@ -22,191 +22,8 @@ let mouse;
 const size = canvasWidth / 7;
 const ballRadius = size / 10;
 
-const positions = {
-    p1: {
-        x: size,
-        y: size
-    },
-    p2: {
-        x: 2 * size,
-        y: size
-    },
-    p3: {
-        x: 3 * size,
-        y: size
-    },
-    p4: {
-        x: 4 * size,
-        y: size
-    },
-    p5: {
-        x: 5 * size,
-        y: size
-    },
-    p6: {
-        x: 6 * size,
-        y: size
-    },
-    p7: {
-        x: size,
-        y: 2 * size
-    },
-    p8: {
-        x: 2 * size,
-        y: 2 * size
-    },
-    p9: {
-        x: 3 * size,
-        y: 2 * size
-    },
-    p10: {
-        x: 4 * size,
-        y: 2 * size
-    },
-    p11: {
-        x: 5 * size,
-        y: 2 * size
-    },
-    p12: {
-        x: 6 * size,
-        y: 2 * size
-    },
-    p13: {
-        x: size,
-        y: 3 * size
-    },
-    p14: {
-        x: 2 * size,
-        y: 3 * size
-    },
-    p15: {
-        x: 3 * size,
-        y: 3 * size
-    },
-    p16: {
-        x: 4 * size,
-        y: 3 * size
-    },
-    p17: {
-        x: 5 * size,
-        y: 3 * size
-    },
-    p18: {
-        x: 6 * size,
-        y: 3 * size
-    },
-    p19: {
-        x: size,
-        y: 4 * size
-    },
-    p20: {
-        x: 2 * size,
-        y: 4 * size
-    },
-    p21: {
-        x: 3 * size,
-        y: 4 * size
-    },
-    p22: {
-        x: 4 * size,
-        y: 4 * size
-    },
-    p23: {
-        x: 5 * size,
-        y: 4 * size
-    },
-    p24: {
-        x: 6 * size,
-        y: 4 * size
-    },
-    p25: {
-        x: size,
-        y: 5 * size
-    },
-    p26: {
-        x: 2 * size,
-        y: 5 * size
-    },
-    p27: {
-        x: 3 * size,
-        y: 5 * size
-    },
-    p28: {
-        x: 4 * size,
-        y: 5 * size
-    },
-    p29: {
-        x: 5 * size,
-        y: 5 * size
-    },
-    p30: {
-        x: 6 * size,
-        y: 5 * size
-    },
-    p31: {
-        x: size,
-        y: 6 * size
-    },
-    p32: {
-        x: 2 * size,
-        y: 6 * size
-    },
-    p33: {
-        x: 3 * size,
-        y: 6 * size
-    },
-    p34: {
-        x: 4 * size,
-        y: 6 * size
-    },
-    p35: {
-        x: 5 * size,
-        y: 6 * size
-    },
-    p36: {
-        x: 6 * size,
-        y: 6 * size
-    },
-};
-
-const relations = {
-    p1: ['p2', 'p7'],
-    p2: ['p1', 'p3', 'p8'],
-    p3: ['p2', 'p4', 'p9'],
-    p4: ['p3', 'p5', 'p10'],
-    p5: ['p4', 'p6', 'p11'],
-    p6: ['p5', 'p12'],
-    p7: ['p1', 'p8', 'p13'],
-    p8: ['p7', 'p9', 'p2', 'p14'],
-    p9: ['p8', 'p10', 'p3', 'p15'],
-    p10: ['p9', 'p11', 'p4', 'p16'],
-    p11: ['p10', 'p12', 'p5', 'p17'],
-    p12: ['p11', 'p6', 'p18'],
-    p13: ['p14', 'p7', 'p19'],
-    p14: ['p13', 'p15', 'p8', 'p20'],
-    p15: ['p14', 'p16', 'p9', 'p21', 'p22'],
-    p16: ['p15', 'p17', 'p10', 'p21', 'p22'],
-    p17: ['p16', 'p18', 'p11', 'p23'],
-    p18: ['p17', 'p12', 'p24'],
-    p19: ['p20', 'p13', 'p25'],
-    p20: ['p19', 'p21', 'p14', 'p26'],
-    p21: ['p20', 'p22', 'p15', 'p16', 'p27'],
-    p22: ['p21', 'p23', 'p16', 'p28', 'p15'],
-    p23: ['p22', 'p24', 'p17', 'p29'],
-    p24: ['p23', 'p18', 'p30'],
-    p25: ['p26', 'p19', 'p31'],
-    p26: ['p25', 'p27', 'p20', 'p32'],
-    p27: ['p26', 'p28', 'p21', 'p33'],
-    p28: ['p27', 'p29', 'p22', 'p34'],
-    p29: ['p28', 'p30', 'p23', 'p35'],
-    p30: ['p29', 'p24', 'p36'],
-    p31: ['p25', 'p32'],
-    p32: ['p31', 'p33', 'p26'],
-    p33: ['p32', 'p34', 'p27'],
-    p34: ['p33', 'p35', 'p28'],
-    p35: ['p34', 'p36', 'p29'],
-    p36: ['p35', 'p30'],
-};
+const positions = {};
+const relations = {};
 
 const lynxStart = 'p21';
 const perdicinaeStart = 'p31';
@@ -224,6 +41,49 @@ const perdicinae = {
 };
 
 const animals = [lynx, perdicinae];
+
+function init(){
+    let arrSize = 6;
+    for(const r of Array(arrSize).keys()){
+        for(const c of Array(arrSize).keys()){
+            let key = grid2line(r,c);
+            // setup positions
+            positions[key] = {x: (c+1)*size, y: (r+1)*size};
+            // setup relations
+            relations[key] = neigborArray(r,c);
+        }
+    }
+
+    function grid2line(r, c){
+        return "p" + (arrSize * r + c + 1).toString();
+    }
+
+    function neigborArray(r,c) {
+        const nArr = [];
+        // standard grid neighbors
+        if (r-1 >= 0){
+            nArr.push(grid2line(r-1,c));
+        }
+        if (r+1 < arrSize){
+            nArr.push(grid2line(r+1,c));
+        }
+        if (c-1 >= 0){
+            nArr.push(grid2line(r,c-1));
+        }
+        if (c+1 < arrSize){
+            nArr.push(grid2line(r,c+1));
+        }
+
+        // center special cross
+        const key = grid2line(r,c);
+        const center = [[2,2], [2,3], [3,2], [3,3]].map(x => grid2line(x[0], x[1]));
+        const idx = center.indexOf(key);
+        if(idx !== -1){
+            nArr.push(center[(center.length-1) - idx]);
+        }
+        return nArr;
+    }
+};
 
 function drawField() {
     Object.keys(positions).forEach(function (key) {
@@ -408,4 +268,5 @@ function draw() {
     drawAnimals();
 }
 
+init();
 draw();
