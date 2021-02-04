@@ -87,7 +87,7 @@ function init(){
 };
 
 function drawField() {
-    Object.keys(positions).forEach(function (key) {
+    Object.keys(positions).forEach(key => {
         let position = positions[key];
         ctx.beginPath();
         ctx.arc(position.x, position.y, ballRadius, 0, Math.PI*2, false);
@@ -99,14 +99,14 @@ function drawField() {
             return;
         }
 
-        relations[key].forEach(function (relation) {
+        relations[key].forEach(relation => {
             ctx.beginPath();
             ctx.moveTo(position.x, position.y);
             ctx.lineTo(positions[relation].x, positions[relation].y);
             ctx.lineWidth = 2;
             ctx.strokeStyle = fieldColor;
             ctx.stroke();
-        })
+        });
     });
 }
 
@@ -138,11 +138,19 @@ function drawMoves(animal) {
 
 function drawOneMove(animal, position) {
     ctx.beginPath();
-    ctx.strokeStyle = animal.colour;
     ctx.arc(positions[position].x, positions[position].y, gridCellSizePx / 5, 0, 2 * Math.PI);
     ctx.lineWidth = 2;
+    ctx.strokeStyle = animal.colour;
     ctx.stroke();
     ctx.closePath();
+}
+
+function positionWithinMove(animal, position, mouse) {
+    // Hack to allow using isPointInPath function
+    // by redrawing already existing possible move ball
+    drawOneMove(animal, position);
+
+    return ctx.isPointInPath(mouse.x, mouse.y);
 }
 
 function startGame() {
@@ -150,13 +158,16 @@ function startGame() {
     drawMoves(animals[activeAnimal]);
     updateAnimalImage(animals[activeAnimal]);
 
-    gameActive = true;
-
-    startButton.textContent = 'Sākt vēlreiz';
-    animalMoves.classList.remove('visually-hidden');
+    // show startButton as active
     startButton.classList.remove('btn-warning');
     startButton.classList.add('btn-danger');
+    startButton.textContent = 'Sākt vēlreiz';
+
+    // show game HUD details
+    animalMoves.classList.remove('visually-hidden');
     animalImage.classList.remove('visually-hidden');
+
+    gameActive = true;
 }
 
 function resetAnimalPositions() {
@@ -180,10 +191,13 @@ document.querySelectorAll('.return-to-start').forEach(item => {
     item.addEventListener('click', event => {
         resetAnimalPositions();
 
-        startButton.textContent = 'Sākt spēli';
-        animalMoves.classList.add('visually-hidden');
+        // show startButton (inactive?) green
         startButton.classList.add('btn-warning');
         startButton.classList.remove('btn-danger');
+        startButton.textContent = 'Sākt spēli';
+
+        // hide game HUD details
+        animalMoves.classList.add('visually-hidden');
         animalImage.classList.add('visually-hidden');
 
         gameActive = false;
@@ -202,54 +216,58 @@ canvas.addEventListener(
 
         let possibleMoves = relations[animals[activeAnimal].position];
 
+        let validMove = null;
         for (const move of possibleMoves) {
-            drawOneMove(animals[activeAnimal], move);
-
-            if (ctx.isPointInPath(mouse.x, mouse.y)) {
-                const aniPosX = Math.round(mouse.x / gridCellSizePx) * gridCellSizePx;
-                const aniPosY = Math.round(mouse.y / gridCellSizePx) * gridCellSizePx;
-
-                animals[activeAnimal].position = Object.keys(positions)
-                    .find(key => positions[key].x === aniPosX && positions[key].y === aniPosY);
-
-                if (activeAnimal === 0) {
-                    lynxMovesLeft--;
-                    lynxMovesLeftText.textContent = String(lynxMovesLeft);
-                }
-
-                // end game: lynx caught perdicinae
-                if (lynx.position === perdicinae.position) {
-                    modalText.textContent = String('Lūsis noķēra irbi');
-                    animalImageWin.src = `${lynx.name}-win.jpg`;
-                    winnerModal.show();
-
-                    break;
-                }
-
-                // end game: lynx ran out of moves
-                if (lynxMovesLeft === 0) {
-                    modalText.textContent = String('Irbe aizbēga');
-                    animalImageWin.src = `${perdicinae.name}-win.jpg`;
-                    winnerModal.show();
-
-                    break;
-                }
-
-                activeAnimal = activeAnimal === LynxIdx ? 1 : LynxIdx;
-
-                // update game HUD for animal turn details
-                let animalName = activeAnimal === LynxIdx ? 'Lūša' : 'Irbes';
-                document.getElementById('animal').textContent = `${animalName} gājiens`;
-
-                updateAnimalImage(animals[activeAnimal]);
-                draw();
-                drawMoves(animals[activeAnimal]);
-
+            if (positionWithinMove(activeAnimal, move, mouse)) {
+                // mouse click on possible move
+                validMove = move;
                 break;
-            } else {
-                console.log("not in path");
             }
         }
+        if (validMove == null){
+            // mouse click outside all possible move's ballRadius-es
+            // do nothing
+            return;
+        }
+
+        const aniPosX = Math.round(mouse.x / gridCellSizePx) * gridCellSizePx;
+        const aniPosY = Math.round(mouse.y / gridCellSizePx) * gridCellSizePx;
+
+        animals[activeAnimal].position = Object.keys(positions)
+            .find(key => positions[key].x === aniPosX && positions[key].y === aniPosY);
+
+        // update lynx moves left
+        if (activeAnimal === LynxIdx) {
+            lynxMovesLeft--;
+            lynxMovesLeftText.textContent = String(lynxMovesLeft);
+        }
+
+        // end game: lynx caught perdicinae
+        if (lynx.position === perdicinae.position) {
+            modalText.textContent = String('Lūsis noķēra irbi');
+            animalImageWin.src = `${lynx.name}-win.jpg`;
+            winnerModal.show();
+            return;
+        }
+
+        // end game: lynx ran out of moves
+        if (lynxMovesLeft === 0) {
+            modalText.textContent = String('Irbe aizbēga');
+            animalImageWin.src = `${perdicinae.name}-win.jpg`;
+            winnerModal.show();
+            return;
+        }
+
+        activeAnimal = activeAnimal === LynxIdx ? 1 : LynxIdx;
+
+        // update game HUD for animal turn details
+        let animalName = activeAnimal === LynxIdx ? 'Lūša' : 'Irbes';
+        document.getElementById('animal').textContent = `${animalName} gājiens`;
+
+        updateAnimalImage(animals[activeAnimal]);
+        draw();
+        drawMoves(animals[activeAnimal]);
+
     },
     false
 );
